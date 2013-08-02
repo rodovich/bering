@@ -11,6 +11,10 @@ def rollback(files)
   end
 end
 
+def migrate(files)
+  system "rake db:migrate" unless files.empty?
+end
+
 rollbacks = []
 migrations = []
 
@@ -23,3 +27,4 @@ end
 puts "Migrating:  #{migrations.count} up, #{rollbacks.count} down"
 
 rollback(rollbacks)
+migrate(migrations)
