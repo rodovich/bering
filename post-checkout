@@ -1,12 +1,20 @@
 #!/usr/bin/env ruby
 
-from, to, flag = ARGV
-exit unless flag == '1' && to != from
+@from, @to, flag = ARGV
+exit unless flag == '1' && @to != @from
+
+def rollback(files)
+  unless files.empty?
+    `git checkout #{@from} #{files.join(' ')}`
+    system "rake db:rollback STEP=#{files.count}"
+    `git reset --hard`
+  end
+end
 
 rollbacks = []
 migrations = []
 
-`git diff --name-status #{from} #{to} db/migrate/`.split("\n").each do |line|
+`git diff --name-status #{@from} #{@to} db/migrate/`.split("\n").each do |line|
   status, file = line.split("\t")
   rollbacks <<= file if status == "D"
   migrations <<= file if status == "A"
@@ -14,3 +22,4 @@ end
 
 puts "Migrating:  #{migrations.count} up, #{rollbacks.count} down"
 
+rollback(rollbacks)
