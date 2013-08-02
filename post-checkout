@@ -24,7 +24,7 @@ migrations = []
   migrations <<= file if status == "A"
 end
 
-puts "Migrating:  #{migrations.count} up, #{rollbacks.count} down"
+puts "Migrating:  #{rollbacks.count} down, #{migrations.count} up"
 
 rollback(rollbacks)
 migrate(migrations)
