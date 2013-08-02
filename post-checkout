@@ -1,9 +1,11 @@
 #!/usr/bin/env ruby
 
+from, to, flag = ARGV
+
 rollbacks = []
 migrations = []
 
-`git diff --name-status HEAD@{1} HEAD db/migrate/`.split("\n").each do |line|
+`git diff --name-status #{from} #{to} db/migrate/`.split("\n").each do |line|
   status, file = line.split("\t")
   rollbacks <<= file if status == "D"
   migrations <<= file if status == "A"
