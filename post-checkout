@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 from, to, flag = ARGV
+exit unless flag == '1' && to != from
 
 rollbacks = []
 migrations = []
