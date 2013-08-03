@@ -3,6 +3,13 @@
 @from, @to, flag = ARGV
 exit unless flag == '1' && @to != @from
 
+def changes_in(path, from, to, statuses='ADM')
+  `git diff --name-status #{from} #{to} #{path}`.split("\n").inject([]) do |results, line|
+    status, file = line.split("\t")
+    results << file if statuses.index(status)
+  end
+end
+
 def rollback(files)
   unless files.empty?
     `git checkout #{@from} #{files.join(' ')}`
@@ -15,14 +22,10 @@ def migrate(files)
   system "rake db:migrate" unless files.empty?
 end
 
-rollbacks = []
-migrations = []
-
-`git diff --name-status #{@from} #{@to} db/migrate/`.split("\n").each do |line|
-  status, file = line.split("\t")
-  rollbacks <<= file if status == "D"
-  migrations <<= file if status == "A"
-end
+path = 'db/migrate/'
+ancestor = `git merge-base #{@from} #{@to}`.split("\n")[0]
+rollbacks = changes_in(path, ancestor, @from, 'A')
+migrations = changes_in(path, ancestor, @to, 'A')
 
 puts "Migrating:  #{rollbacks.count} down, #{migrations.count} up"
 
