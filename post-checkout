@@ -1,21 +1,10 @@
 #!/usr/bin/env ruby
 
 require_relative "lib/git"
+require_relative "lib/schema"
 
 @from, @to, flag = ARGV
 exit unless flag == '1' && @to != @from
-
-def rollback(files)
-  unless files.empty?
-    Git.checkout(@from, files)
-    system "rake db:rollback STEP=#{files.count}"
-    Git.reset
-  end
-end
-
-def migrate(files)
-  system "rake db:migrate" unless files.empty?
-end
 
 path = 'db/migrate/'
 ancestor = Git.common_ancestor(@from, @to)
@@ -24,5 +13,10 @@ migrations = Git.changes_in(path, ancestor, @to, 'A')
 
 puts "Migrating:  #{rollbacks.count} down, #{migrations.count} up"
 
-rollback(rollbacks)
-migrate(migrations)
+unless rollbacks.empty?
+  Git.checkout(@from, rollbacks)
+  Schema.rollback(rollbacks)
+  Git.reset
+end
+
+Schema.migrate(migrations)
