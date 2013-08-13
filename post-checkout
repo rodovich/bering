@@ -1,10 +1,10 @@
 #!/usr/bin/env ruby
 
-require_relative "lib/git"
-require_relative "lib/schema"
-
 @from, @to, flag = ARGV
 exit unless flag == '1' && @to != @from
+
+require_relative "lib/git"
+require_relative "lib/schema"
 
 path = 'db/migrate/'
 ancestor = Git.common_ancestor(@from, @to)
