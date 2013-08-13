@@ -14,9 +14,10 @@ migrations = Git.changes_in(path, ancestor, to, 'A')
 puts "Migrating:  #{rollbacks.count} down, #{migrations.count} up"
 
 unless rollbacks.empty?
-  Git.checkout(from, rollbacks)
-  Schema.rollback(rollbacks)
-  Git.reset
+  Git.within_sandbox do
+    Git.checkout(from, rollbacks)
+    Schema.rollback(rollbacks)
+  end
 end
 
 Schema.migrate(migrations)

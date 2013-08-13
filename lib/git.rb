@@ -17,7 +17,16 @@ module Git
     IO.popen(cmd, 'r').readline.strip
   end
 
-  def Git.reset
+  def Git.has_changes?
+    `git status --porcelain`.lines.any?
+  end
+
+  def Git.within_sandbox
+    stashing = Git.has_changes?
+    `git stash save --include-untracked` if stashing
+    result = yield
     `git reset --hard`
+    `git stash pop` if stashing
+    result
   end
 end
