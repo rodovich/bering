@@ -1,0 +1,15 @@
+#!/usr/bin/env ruby
+
+operation = ARGV.shift
+exit unless operation == 'rebase'
+
+require_relative "lib/git"
+require_relative "lib/schema"
+
+from = "#{gets.split(' ')[1]}^"
+
+path = 'db/migrate/'
+migrations = Git.changes_in(path, from, 'HEAD', 'A')
+
+puts "Migrating:  #{migrations.count} up"
+Schema.migrate(migrations)
