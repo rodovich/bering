@@ -1,17 +1,20 @@
 module Git
   def Git.changes_in(path, from, to, statuses='ADM')
-    `git diff --name-status #{from} #{to} #{path}`.split("\n").inject([]) do |results, line|
-      status, file = line.split("\t")
+    cmd = ['git', 'diff', '--name-status', from, to, path]
+    IO.popen(cmd, 'r').readlines.inject([]) do |results, line|
+      status, file = line.strip.split("\t")
       results << file if statuses.index(status)
     end
   end
 
   def Git.checkout(branch, files={})
-    `git checkout #{branch} #{files.join(' ')}`
+    cmd = ['git', 'checkout', branch] + files
+    IO.popen(cmd, 'r').read
   end
 
   def Git.common_ancestor(from, to)
-    `git merge-base #{from} #{to}`.split("\n")[0]
+    cmd = ['git', 'merge-base', from, to]
+    IO.popen(cmd, 'r').readline.strip
   end
 
   def Git.reset
