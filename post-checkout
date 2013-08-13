@@ -1,20 +1,15 @@
 #!/usr/bin/env ruby
 
+require_relative "lib/git"
+
 @from, @to, flag = ARGV
 exit unless flag == '1' && @to != @from
 
-def changes_in(path, from, to, statuses='ADM')
-  `git diff --name-status #{from} #{to} #{path}`.split("\n").inject([]) do |results, line|
-    status, file = line.split("\t")
-    results << file if statuses.index(status)
-  end
-end
-
 def rollback(files)
   unless files.empty?
-    `git checkout #{@from} #{files.join(' ')}`
+    Git.checkout(@from, files)
     system "rake db:rollback STEP=#{files.count}"
-    `git reset --hard`
+    Git.reset
   end
 end
 
@@ -23,9 +18,9 @@ def migrate(files)
 end
 
 path = 'db/migrate/'
-ancestor = `git merge-base #{@from} #{@to}`.split("\n")[0]
-rollbacks = changes_in(path, ancestor, @from, 'A')
-migrations = changes_in(path, ancestor, @to, 'A')
+ancestor = Git.common_ancestor(@from, @to)
+rollbacks = Git.changes_in(path, ancestor, @from, 'A')
+migrations = Git.changes_in(path, ancestor, @to, 'A')
 
 puts "Migrating:  #{rollbacks.count} down, #{migrations.count} up"
 
