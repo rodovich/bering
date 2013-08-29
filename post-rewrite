@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+exit if ENV['AUTO_MIGRATE'] == '0'
+
 operation = ARGV.shift
 exit unless operation == 'rebase'
 
