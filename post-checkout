@@ -15,8 +15,9 @@ migrations = Git.changes_in(path, ancestor, to, 'A')
 
 puts "Migrating:  #{rollbacks.count} down, #{migrations.count} up"
 
-unless rollbacks.empty?
+if rollbacks.any?
   Git.within_sandbox do
+    File.delete(*migrations) unless migrations.empty?
     Git.checkout(from, rollbacks)
     Schema.rollback(rollbacks)
   end
