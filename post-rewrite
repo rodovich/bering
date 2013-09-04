@@ -12,5 +12,6 @@ from = "#{gets.split(' ')[1]}^"
 
 migrations = Git.changes_in(Schema::MIGRATIONS_PATH, from, 'HEAD', 'A')
 
-puts "Migrating:  #{migrations.count} up"
+Schema.print_plan(:migrations => migrations)
+
 Schema.migrate(migrations)

@@ -12,7 +12,7 @@ ancestor = Git.common_ancestor(from, to)
 rollbacks = Git.changes_in(Schema::MIGRATIONS_PATH, ancestor, from, 'A')
 migrations = Git.changes_in(Schema::MIGRATIONS_PATH, ancestor, to, 'A')
 
-puts "Migrating:  #{rollbacks.count} down, #{migrations.count} up"
+Schema.print_plan(:rollbacks => rollbacks, :migrations => migrations)
 
 if rollbacks.any?
   Git.within_sandbox do
