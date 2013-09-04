@@ -8,10 +8,9 @@ exit unless flag == '1' && to != from
 require_relative "lib/git"
 require_relative "lib/schema"
 
-path = 'db/migrate/'
 ancestor = Git.common_ancestor(from, to)
-rollbacks = Git.changes_in(path, ancestor, from, 'A')
-migrations = Git.changes_in(path, ancestor, to, 'A')
+rollbacks = Git.changes_in(Schema::MIGRATIONS_PATH, ancestor, from, 'A')
+migrations = Git.changes_in(Schema::MIGRATIONS_PATH, ancestor, to, 'A')
 
 puts "Migrating:  #{rollbacks.count} down, #{migrations.count} up"
 

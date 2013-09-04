@@ -1,4 +1,6 @@
 module Schema
+  MIGRATIONS_PATH = 'db/migrate/'
+
   def Schema.migrate(files)
     system "rake db:migrate" unless files.empty?
   end
