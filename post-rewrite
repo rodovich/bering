@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 exit if ENV['AUTO_MIGRATE'] == '0'
+raise 'Ruby >= 1.9 required' unless (RUBY_VERSION.split('.').map(&:to_i) <=> [1, 9]) >= 0
 
 operation = ARGV.shift
 exit unless operation == 'rebase'
