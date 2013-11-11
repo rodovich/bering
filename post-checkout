@@ -23,4 +23,8 @@ if rollbacks.any?
   end
 end
 
-Schema.migrate(migrations)
+if migrations.any?
+  Git.within_sandbox do
+    Schema.migrate(migrations)
+  end
+end

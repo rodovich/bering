@@ -15,4 +15,8 @@ migrations = Git.changes_in(Schema::MIGRATIONS_PATH, from, 'HEAD', 'A')
 
 Schema.print_plan(:migrations => migrations)
 
-Schema.migrate(migrations)
+if migrations.any?
+  Git.within_sandbox do
+    Schema.migrate(migrations)
+  end
+end
